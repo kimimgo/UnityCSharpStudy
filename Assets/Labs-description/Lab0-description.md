@@ -6,6 +6,10 @@
 2. Hello Helen 텍스트 매쉬에 Hello imgyu 추가
 3. commit & push
 
+![Alt text](./scene.png)
+![Alt text](./team.png)
+![Alt text](./github+vs.png)
+
 ### 주의사항
 1. Visual studio 2015 or 2017에서 코드를 수정할 것.
 2. 수정의 확인은 Unity scene, game 창에서.
