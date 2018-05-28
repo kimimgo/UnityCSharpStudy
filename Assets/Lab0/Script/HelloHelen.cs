@@ -9,7 +9,7 @@ public class HelloHelen : MonoBehaviour {
     
 	// Use this for initialization
 	void Start () {
-        Debug.Log("this is first push");
+        Debug.Log("this is first push2");
         tt.text = "hello imgyu";
     }
 	
