@@ -20,7 +20,9 @@ For helen...
 
 0. Unity Hub의 사용과 협업 프로세스의 이해
 1. Unity와 Window console의 연동
-2. txt / xml 
+2. Lab2 파일 I/O txt와 xml
+3. Wave generation with Noise
+4. Unity ComputeShader
 3. oop 기초
 4. .NET framework : interface
 5. sorting algorithms
@@ -31,7 +33,6 @@ For helen...
 9. .NET framework : Lambda
 10. PInvoke
 11. (option) C++/CLI
-12. Unity ComputeShader
 13. Unity Flok simulation
 14. Unity Voxel
 15. Unity Grid-based Fluid simulation 2D
@@ -45,7 +46,7 @@ For helen...
 1. Lab 폴더에 새로운 Lab이 업로드가 되면 git clone 으로 자료를 다운 받는다.
 2. 다운 받은 자료를 바탕으로 Lab 수행 후 git commit & push
 3. push가 되면 제가 코드를 보고 코멘트를 줄 것임. approve or not.
-4. 대부분 '해답 코드'를 가지고 있지 않음. 정답은 없다는 말.5
+4. 대부분 '해답 코드'를 가지고 있지 않음. 정답은 없다는 말.
 5. 제가 미리 구현한 것이 있다면 참고용으로 업로드 해드림. 서로 코멘트 해주는 형식을 취하면 좋을 것이라 생각.
 
 
