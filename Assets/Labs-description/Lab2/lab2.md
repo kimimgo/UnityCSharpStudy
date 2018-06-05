@@ -23,15 +23,16 @@ data.txt파일은 학생당 과목별 점수임. 이 입력 파일을 읽어들�
 3. C# 프로그램 작성시 Text 파일을 처리하는 StreamReader, StreamWriter 클래스를 사용해서 구현하기
 4. (optional) output 파일을 xml 파일로 구조화 하여 저장해보기 
 예)
-"<student>
-    <number>1</number>
-    <korean>85</korean>
-    <english>92</english>
-    <math>88</math>
-    <sum> ... </sum>
-    <avrg> ... </avrg>
-</student>
-..."
+(꺽쇠 괄호를 쓰기 html tag 형태로..)
+student
+    number 1 /number
+    korean 85 /korean
+    english 92 /english
+    math 88 /math
+    sum ... /sum
+    avrg ... /avrg
+/student
+...
 
 힌트 : system.xml 클래스의 XmlDocument 이용하기.
 
