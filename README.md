@@ -1,5 +1,6 @@
 # UnityCshapStudy
 For helen...
+And me
 
 ## 목적
 1. C#과 Unity를 공부한다.
