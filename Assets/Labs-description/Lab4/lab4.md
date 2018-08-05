@@ -1,10 +1,12 @@
-#Lab4 Unity Shader Programming
+# Lab4 Unity Shader Programming
 
 Unity에서는 OpenGL과 같은 Low-level의 그래픽스 라이브러리 보다 더 쉽게 셰이더를 구현할 수 있다.
 더불어 Global Illumination과 같은 계산량이 높다고 알려져있던 Physical based rendering 기능도 Unity5부터 제공하기 시작하였다.
-특히 Unity의 컴퓨트 셰이더(Compute Shader)란 특수한 기능이 있는데 이는  GPU를 사용하여 간단한 처리를 병렬화 하고 많은 양의 작업을 고속으로 실행하기 위해 이용된다.
+https://unity3d.com/kr/learn/tutorials/topics/graphics/gentle-introduction-shaders
+
+Unity가 정말 좋아진 이유는 컴퓨트 셰이더(Compute Shader)란 특수한 기능이 있는데 이는  GPU를 사용하여 간단한 처리를 병렬화 하고 많은 양의 작업을 고속으로 실행할 수가 있다.
 또한 같은 GPU를 이용한 처리를 하지만 일반적인 렌더링 파이프라인과 다른 특징이 있다.
-CG에서는 종종 많은 수의 입자의 움직임을 표현하는 데 사용된다.
+대부분 많은 수의 인스턴스 혹은 입자의 움직임을 표현하는 데 사용된다.
 
 Unity 컴퓨트 셰이더의 기본 개념은 DirectX의 DirectCompute와 밀접한 관련이 있으며, 
 이밖에도 OpenCL, CUDA 등의 유사한 기술들이 존재한다. 

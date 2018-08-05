@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
+
+
+
 
 namespace Consolation
 {
@@ -17,7 +21,7 @@ namespace Consolation
         /// <summary>
         /// The hotkey to show and hide the console window.
         /// </summary>
-        public KeyCode toggleKey = KeyCode.BackQuote;
+        public KeyCode toggleKey = KeyCode.F5;
 
         /// <summary>
         /// Whether to open as soon as the game starts.
@@ -63,6 +67,8 @@ namespace Consolation
         bool isCollapsed;
         bool isVisible;
         readonly List<Log> logs = new List<Log>();
+        readonly ConcurrentQueue<Log> queuedLogs = new ConcurrentQueue<Log>();
+
         Vector2 scrollPosition;
         readonly Rect titleBarRect = new Rect(0, 0, 10000, 20);
         Rect windowRect = new Rect(margin, margin, Screen.width - (margin * 2), Screen.height - (margin * 2));
@@ -80,12 +86,12 @@ namespace Consolation
 
         void OnDisable()
         {
-            Application.logMessageReceivedThreaded -= HandleLog;
+            Application.logMessageReceivedThreaded -= HandleLogThreaded;
         }
 
         void OnEnable()
         {
-            Application.logMessageReceivedThreaded += HandleLog;
+            Application.logMessageReceivedThreaded += HandleLogThreaded;
         }
 
         void OnGUI()
@@ -104,10 +110,23 @@ namespace Consolation
             {
                 isVisible = true;
             }
+
+            Debug.Log("12345");
+            palindrome(12345);
+
+            Debug.Log("-101");
+            palindrome(-101);
+
+            Debug.Log("11111");
+            palindrome(11111);
+
+
         }
 
         void Update()
         {
+            UpdateQueuedLogs();
+
             if (Input.GetKeyDown(toggleKey))
             {
                 isVisible = !isVisible;
@@ -117,7 +136,67 @@ namespace Consolation
             {
                 isVisible = true;
             }
+
+
+
         }
+
+
+
+        void palindrome(int n)
+        {
+            if (n < 0)
+            {
+                Debug.Log("false");
+                return;
+            }
+            else if (n == 0)
+            {
+                Debug.Log("true");
+                return;
+            }
+
+            int i = 1; //자릿수 찾기
+            int a = 10;
+            while (true)
+            {
+                if (n / a != 0)
+                {
+                    a *= 10;
+                    i++;
+                }
+                else
+                {
+                    a = a / 10;
+                    break;
+                }
+
+            }
+
+            int n2 = n;
+            int m = 0;
+            int c = 1;
+
+            for (int j = i; j >= 1; j--)
+            {
+
+                int b = n2 / a;
+                m = m + b * c;
+                n2 = n2 - b * a;
+                a = a / 10;
+                c = c * 10;
+
+            }
+
+
+
+            if (m == n) Debug.Log("true");
+            else Debug.Log("false");
+
+
+        }
+
+
 
         #endregion
 
@@ -125,9 +204,9 @@ namespace Consolation
         {
             GUILayout.BeginHorizontal();
 
-                GUILayout.Label(log.message);
-                GUILayout.FlexibleSpace();
-                GUILayout.Label(log.count.ToString(), GUI.skin.box);
+            GUILayout.Label(log.message);
+            GUILayout.FlexibleSpace();
+            GUILayout.Label(log.count.ToString(), GUI.skin.box);
 
             GUILayout.EndHorizontal();
         }
@@ -161,12 +240,12 @@ namespace Consolation
             // Used to determine height of accumulated log labels.
             GUILayout.BeginVertical();
 
-                var visibleLogs = logs.Where(IsLogVisible);
+            var visibleLogs = logs.Where(IsLogVisible);
 
-                foreach (Log log in visibleLogs)
-                {
-                    DrawLog(log);
-                }
+            foreach (Log log in visibleLogs)
+            {
+                DrawLog(log);
+            }
 
             GUILayout.EndVertical();
             var innerScrollRect = GUILayoutUtility.GetLastRect();
@@ -187,20 +266,20 @@ namespace Consolation
         {
             GUILayout.BeginHorizontal();
 
-                if (GUILayout.Button(clearLabel))
-                {
-                    logs.Clear();
-                }
+            if (GUILayout.Button(clearLabel))
+            {
+                logs.Clear();
+            }
 
-                foreach (LogType logType in Enum.GetValues(typeof(LogType)))
-                {
-                    var currentState = logTypeFilters[logType];
-                    var label = logType.ToString();
-                    logTypeFilters[logType] = GUILayout.Toggle(currentState, label, GUILayout.ExpandWidth(false));
-                    GUILayout.Space(20);
-                }
+            foreach (LogType logType in Enum.GetValues(typeof(LogType)))
+            {
+                var currentState = logTypeFilters[logType];
+                var label = logType.ToString();
+                logTypeFilters[logType] = GUILayout.Toggle(currentState, label, GUILayout.ExpandWidth(false));
+                GUILayout.Space(20);
+            }
 
-                isCollapsed = GUILayout.Toggle(isCollapsed, collapseLabel, GUILayout.ExpandWidth(false));
+            isCollapsed = GUILayout.Toggle(isCollapsed, collapseLabel, GUILayout.ExpandWidth(false));
 
             GUILayout.EndHorizontal();
         }
@@ -224,15 +303,32 @@ namespace Consolation
             return logs.Last();
         }
 
-        void HandleLog(string message, string stackTrace, LogType type)
+        void UpdateQueuedLogs()
         {
-            var log = new Log {
+            Log log;
+            while (queuedLogs.TryDequeue(out log))
+            {
+                ProcessLogItem(log);
+            }
+        }
+
+        void HandleLogThreaded(string message, string stackTrace, LogType type)
+        {
+            var log = new Log
+            {
                 count = 1,
                 message = message,
                 stackTrace = stackTrace,
                 type = type,
             };
 
+            // Queue the log into a ConcurrentQueue to be processed later in the Unity main thread,
+            // so that we don't get GUI-related errors for logs coming from other threads
+            queuedLogs.Enqueue(log);
+        }
+
+        void ProcessLogItem(Log log)
+        {
             var lastLog = GetLastLog();
             var isDuplicateOfLastLog = lastLog.HasValue && log.Equals(lastLog.Value);
 
@@ -294,6 +390,8 @@ namespace Consolation
         }
     }
 
+
+
     /// <summary>
     /// A basic container for log details.
     /// </summary>
@@ -307,6 +405,43 @@ namespace Consolation
         public bool Equals(Log log)
         {
             return message == log.message && stackTrace == log.stackTrace && type == log.type;
+        }
+    }
+
+    /// <summary>
+    /// Alternative to System.Collections.Concurrent.ConcurrentQueue
+    /// (It's only available in .NET 4.0 and greater)
+    /// </summary>
+    /// <remarks>
+    /// It's a bit slow (as it uses locks), and only provides a small subset of the interface
+    /// Overall, the implementation is intended to be simple & robust
+    /// </remarks>
+    public class ConcurrentQueue<T>
+    {
+        private readonly System.Object queueLock = new System.Object();
+        private readonly Queue<T> queue = new Queue<T>();
+
+        public void Enqueue(T item)
+        {
+            lock (queueLock)
+            {
+                queue.Enqueue(item);
+            }
+        }
+
+        public bool TryDequeue(out T result)
+        {
+            lock (queueLock)
+            {
+                if (queue.Count == 0)
+                {
+                    result = default(T);
+                    return false;
+                }
+
+                result = queue.Dequeue();
+                return true;
+            }
         }
     }
 }
